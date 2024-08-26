@@ -1,0 +1,137 @@
+---
+title: "Package 'ORTH.Ord'"
+author: "Can Meng, Fan Li"
+date: "May 2024"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Package 'ORTH.Ord'}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+ORTH.Ord is a package designed for analyzing correlated ordinal outcomes which are commonly seen in longitudinal studies or clustered clinical trials. It implements a modified version of alternating logistic regressions (ALR) with estimation based on orthogonalized residuals (ORTH), which use paired estimating equations to jointly estimate parameters in marginal mean and within-association models. The within-cluster association between ordinal responses is modeled by global pairwise odds ratios (POR). This R package also provides a finite-sample bias correction to POR parameter estimates based on matrix multiplicative adjusted orthogonalized residuals (MMORTH) for correcting estimating equations, and different bias-corrected variance estimators such as BC1, BC2, and BC3. We refer users to our published paper (Meng et al., 2023) for details.
+
+## Statistical Methods
+
+ALR uses marginal models with generalized estimating equations (GEE) to jointly estimate marginal means and within-cluster associations. Let $O_{ij}$ be an ordinal response with $C+1$ levels, say $1,\ldots,C+1$, for the $j^{th}$ observation in the $i^{th}$ cluster, where cluster $i$ has $n_{i}$ observations and $i=1,\dots,N$. Let $Y_{ij}^{(c)}$ denote a binary indicator for the level of ordinal response $O_{ij}$ such that $Y_{ij}^{(c)}=I(O_{ij} \leq c)$ where $c=1,\dots,C$. For a given cluster $i$, the response vector $Y_i=\left(Y_{i1}^{(1)},\dots,Y_{i1}^{(C)},\dots,Y_{in_{i}}^{(1)},\dots,Y_{in_{i}}^{(C)}\right)'$ has $Cn_{i}$ elements. Ordinal outcomes are usually modeled with the proportional odds assumption, which means the covariate vector $X_{ij}$ will have the same effect across all levels of $O_{ij}$. A marginal mean model for $Y_{ij}^{(c)}$ using a proportional-odds cumulative logit model can be written as: 
+\begin{equation}
+\tag{1}
+logit\left\{E\left(Y_{ij}^{(c)}|X_{ij}\right)\right\}=\delta_{c} + X_{ij}^\prime\beta
+\end{equation} 
+where the intercept $\delta_{c}$ represents the log-odds of falling into or below level $c$ ($O_{ij} \leq c$) when $X_{ij}={0}$, and coefficient vector $\beta$ represents the effect of each element of $X_{ij}$ and remains constant across levels of $O_{ij}$ under the proportional odds assumption.\
+\
+
+|         In addition to estimating parameters in model (1) using GEE, a within-cluster association structure is specified. The POR, denoted as $\psi_{ij,k}^{(a,b)}$ for measuring within-cluster association, is defined for the response pair $\left(Y_{ij}^{(a)}, Y_{ik}^{(b)}\right)$ as:
+
+\begin{align}
+    \psi_{ij,k}^{(a,b)} &=\frac{Pr\left(Y_{ij}^{(a)}=1,Y_{ik}^{(b)}=1\right)\times Pr\left(Y_{ij}^{(a)}=0,Y_{ik}^{(b)}=0\right) }{Pr\left(Y_{ij}^{(a)}=1,Y_{ik}^{(b)}=0\right)\times Pr\left(Y_{ij}^{(a)}=0,Y_{ik}^{(b)}=1\right)} \nonumber \\
+    &=\frac{\mu_{ij,k}^{(a,b)}\left(1-\mu_{ij}^{(a)}-\mu_{ik}^{(b)}+\mu_{ij,k}^{(a,b)}\right)}{\left(\mu_{ij}^{(a)}-\mu_{ij,k}^{(a,b)}\right)\left(\mu_{ik}^{(b)}-\mu_{ij,k}^{(a,b)}\right)} 
+\end{align} 
+where $\mu_{ij}^{(a)}=E\left(Y_{ij}^{(a)}\right)=Pr\left(Y_{ij}^{(a)}=1\right)$, $\mu_{ik}^{(b)}=E\left(Y_{ik}^{(b)}\right)=Pr\left(Y_{ik}^{(b)}=1\right)$, and $\mu_{ij,k}^{(a,b)}=E\left(Y_{ij}^{(a)}Y_{ik}^{(b)}\right)=Pr\left(Y_{ij}^{(a)}=Y_{ik}^{(b)}=1\right)$ for $1 \leq a,b \leq C$,$1 \leq j < k \leq n_{i}$. If we let $\alpha$ be a vector of association parameters, then a generalized linear model for $\psi_{ij,k}^{(a,b)}$ is specified as: 
+\begin{equation}
+\tag{2}
+    log\left(\psi_{ij,k}^{(a,b)}\right)=Z^{(a,b)\prime}_{ij,k}\alpha
+\end{equation}\
+where $Z^{(a,b)}_{ij,k}$ is a covariate vector. We assume the POR is independent from cutpoints $a$ and $b$, namely $\psi_{ij,k}^{(a,b)}=\psi_{ij,k}$, so that a parsimonious model for the within-cluster association can be obtained. Note that model (2) is the association model for ALR. The mean parameter $\beta$ from model (1) and association parameter $\alpha$ from model (2) are jointly estimated through GEE. The estimate of $\beta$ from model (1) is the solution to the estimating equations: \begin{equation}
+\tag{3}
+    U_{\beta}=\sum_{i=1}^{N} D_{i}'V_{i}^{-1}(Y_{i}-\mu_{i})=0 
+\end{equation} where $D_i=\partial\mu_i/\partial\beta^\prime$, $\mu_{i}$ is determined by model (1), and $V_i$ is a working variance matrix for the binary response $Y_i$.\
+\
+
+|         ALR also relies on another estimating equations to estimate association parameter vector $\alpha$. In this package, the estimating equation for $\alpha$ is based on ORTH, which could reduce the dependence of the variance estimate on observation ordering and increase efficiency when dealing with unequal cluster sizes. Define $\sigma^{(a)}_{ij,j}=Var\left(Y_{ij}^{(a)}\right)=\mu_{ij}^{(a)}\left(1-\mu_{ij}^{(a)}\right)$, $\sigma^{(b)}_{ik,k}=Var\left(Y_{ik}^{(b)}\right)=\mu_{ik}^{(b)}\left(1-\mu_{ik}^{(b)}\right)$, and $\sigma^{(a,b)}_{ij,k}=Cov\left(Y_{ij}^{(a)},Y_{ik}^{(b)}\right)=\mu_{ij,k}^{(a,b)}-\mu_{ij}^{(a)}\mu_{ik}^{(b)}$ for $1 \leq a,b \leq C$,$1 \leq j < k \leq n_{i}$. In ORTH, orthogonalized residuals, denoted as $T_{ij,k}^{(a,b)}$, are based on the expectations of cross-products $Y_{ij}^{(a)}Y_{ik}^{(b)}$ conditional on $Y_{ij}^{(a)}$ and $Y_{ik}^{(b)}$: $E\left(Y_{ij}^{(a)}Y_{ik}^{(b)}|Y_{ij}^{(a)}, Y_{ik}^{(b)}\right)$. Then $T_{ij,k}^{(a,b)}$ can be expressed as:
+
+\begin{align}
+    T_{ij,k}^{(a,b)} &= \left({\sigma^{(a)}_{ij,j}}{\sigma^{(b)}_{ik,k}}\right)^{1/2}\left(R_{ij,k}^{(a,b)}-\rho_{ij,k}^{(a,b)}\right)-\left(b_{ijk:j}^{(a,b)}-\mu_{ik}^{(b)}\right)\left(Y_{ij}^{(a)}-\mu_{ij}^{(a)}\right)-\left(b_{ijk:k}^{(a,b)}-\mu_{ij}^{(a)}\right)\left(Y_{ik}^{(b)}-\mu_{ik}^{(b)}\right)
+\end{align} where \begin{align}
+    R_{ij,k}^{(a,b)}=&r_{ij}^{(a)}r_{ik}^{(b)}=\left\{\left(Y_{ij}^{(a)}-\mu_{ij}^{(a)}\right)/\left(\sigma^{(a)}_{ij,j}\right)^{1/2}\right\}\left\{\left(Y_{ik}^{(b)}-\mu_{ik}^{(b)}\right)/\left(\sigma^{(b)}_{ik,k}\right)^{1/2}\right\} \\
+    \rho_{ijk}^{(a,b)}=&Corr\left(Y_{ij}^{(a)}, Y_{ik}^{(b)}\right)=\left(\mu_{ij,k}^{(a,b)}-\mu_{ij}^{(a)}\mu_{ik}^{(b)}\right)/\left(\sigma^{(a)}_{ij,j}\sigma^{(b)}_{ik,k}\right)^{1/2} \\
+    b_{ijk:j}^{(a,b)}=& \mu_{ij,k}^{(a,b)}\left(1-\mu_{ik}^{(b)}\right)\left(\mu_{ik}^{(b)}-\mu_{ij,k}^{(a,b)}\right)/d_{ij,k}^{(a,b)} \\
+     b_{ijk:k}^{(a,b)}=& \mu_{ij,k}^{(a,b)}\left(1-\mu_{ij}^{(a)}\right)\left(\mu_{ij}^{(a)}-\mu_{ij,k}^{(a,b)}\right)/d_{ij,k}^{(a,b)} \\
+     d_{ij,k}^{(a,b)}=& \sigma^{(a)}_{ij,j}\sigma^{(b)}_{ik,k}-\left(\sigma^{(a,b)}_{ij,k}\right)^2 
+\end{align} We also define \begin{align}
+    T_{ij,k}=&\left(T_{ij,k}^{(1,1)},T_{ij,k}^{(1,2)},\cdots,T_{ij,k}^{(1,C-1)},T_{ij,k}^{(1,C)},T_{ij,k}^{(2,1)},T_{ij,k}^{(2,2)},\cdots,T_{ij,k}^{(2,C)},\cdots,T_{ij,k}^{(C,1)},T_{ij,k}^{(C,2)},\cdots,T_{ij,k}^{(C,C)}\right)'\\
+    T_{i}=&\left(T_{i1,2}',T_{i1,3}',\cdots,T_{i1,(n_{i}-1)}',T_{i1,n_{i}}',T_{i2,3}',T_{i2,4}',\cdots,T_{i2,(n_{i}-1)}',T_{i2,n_{i}}',\cdots,T_{i(n_{i}-1),n_{i}}'\right)'
+\end{align} to be vectors for the orthogonalized residuals, where the dimension of $T_{i}$ is $C^2n_{i}(n_{i}-1)/2$. In ORTH, association parameter $\alpha$ is estimated by the solution to \begin{equation}
+\tag{4}
+    U_{\alpha, ORTH}=\sum_{i=1}^N S_{i}'P_{i}^{-1}T_{i}=0
+\end{equation} where $S_{i}=E(-\partial T_{i}/\partial \alpha)$, and $P_i\approx Var(T_{i})$ with elements defined by $Cov\left(T_{ij,k}^{(a,b)},T_{ij',k'}^{(a',b')}\right)$.\
+\
+
+|         In order to adjust for small-sample bias in the ORTH procedure, we extend MMORTH to correlated ordinal data analysis. In MMORTH, matrix multiplicative adjusted orthogonalized residuals are used by substituting $R_{ij,k}^{(a,b)}$ with a bias-corrected correlation $\tilde{R}_{ij,k}^{(a,b)}$. Let the cluster leverage matrix be $H_{1i}=D_{i}\left(\sum_{i=1}^N D_{i}'V_{i}^{-1}D_{i}\right)^{-1}D_{i}'V_{i}^{-1}$, and define $G_{i}=(I_{Cn_{i}}-H_{1i})^{-1}$ where $I_{Cn_{i}}$ is an identity matrix. Let $r_{i}$ be a $Cn_{i}\times 1$ vector $\left(r_{i1}^{(1)},\cdots,r_{i1}^{(C)},\cdots,r_{in_{i}}^{(1)},\cdots,r_{in_{i}}^{(C)}\right)$ where $r_{ij}^{c}=\left\{\left(Y_{ij}^{(c)}-\mu_{ij}^{(c)}\right)/\left(\sigma^{(c)}_{ij,j}\right)^{1/2}\right\}$ with $1\leq c \leq C$ and $j=1,\cdots n_{i}$, and define matrix $R_{i}=r_{i}r'_{i}$. We further define $G_{ij\cdot}$ to be the $j^{th}$ row of matrix $G_{i}$, and $R_{i\cdot k}^{(a,b)}$ to be the $k^{th}$ column of matrix $R_{i}$, then $\tilde{R}_{ij,k}^{(a,b)}=G_{ij\cdot}R_{i\cdot k}^{(a,b)}$. The bias-corrected orthogonalized residual, denoted as $\tilde{T}_{ij,k}^{(a,b)}$, is defined as:
+
+\begin{align}
+    \tilde{T}_{ij,k}^{(a,b)} &= \left({\sigma^{(a)}_{ij,j}}{\sigma^{(b)}_{ik,k}}\right)^{1/2}\left(\tilde{R}_{ij,k}^{(a,b)}-\rho_{ij,k}^{(a,b)}\right)-\left(b_{ijk:j}^{(a,b)}-\mu_{ik}^{(b)}\right)\left(Y_{ij}^{(a)}-\mu_{ij}^{(a)}\right)-\left(b_{ijk:k}^{(a,b)}-\mu_{ij}^{(a)}\right)\left(Y_{ik}^{(b)}-\mu_{ik}^{(b)}\right)
+\end{align} MMORTH uses $\tilde{T}_{ij,k}^{(a,b)}$ as an estimate of $T_{ij,k}^{(a,b)}$ in the estimating equation (4).\
+\
+
+|       The GEE sandwich variance estimators also tend to be biased when the number of clusters is small. We implement three popular bias-corrected sandwich variance estimators in this R package, which can be used in combination with ORTH and MMORTH. Let $\Omega_{1i}=\sum_{i=1}^{N} D_{i}'V_{i}^{-1}D_{i}$ be the inverse of the model-based variance, then the sandwich variance estimator for $\hat{\beta}$ can be expressed as:
+
+\begin{equation}
+\tag{5}
+     \Omega_{1i}^{-1} \left\{\sum_{i=1}^{N} C_{1i}D_{i}'V_{i}^{-1}B_{1i}(Y_{i}-\mu_{i})(Y_{i}-\mu_{i})'B_{1i}'V_{i}^{-1}D_{i}C_{1i}\right\} \Omega_{1i}^{-1}
+\end{equation} Further, let $\Omega_{2i}=\sum_{i=1}^{N} S_{i}'P_{i}^{-1}S_{i}$, then the sandwich variance estimator for $\hat{\alpha}$ is: \begin{equation}
+\tag{6}
+    \Omega_{2i}^{-1} \left\{\sum_{i=1}^{N} C_{2i}S_{i}'P_{i}^{-1}B_{2i}T_{i}T_{i}'B_{2i}'P_{i}^{-1}S_{i}C_{2i}\right\} \Omega_{2i}^{-1}
+\end{equation} When $B_{1i}=I$, $B_{2i}=I$, $C_{1i}=I$ and $C_{2i}=I$, there is no bias-correction, and estimators (5) and (6) refer to the uncorrected sandwich estimators for $\beta$ and $\alpha$; we will refer to these estimators as BC0. Different choices for $B_{1i}$, $B_{2i}$, $C_{1i}$, and $C_{2i}$ will give different bias-corrected sandwich estimators. The three commonly used approaches for bias corrections considered here are illustrated as follows. Define $H_{1i}$ and $H_{2i}$ as cluster leverage matrices based on the marginal mean and association regression models. Let $B_{1i}=\left(I-H_{1i}\right)^{-{1}/{2}}$, $B_{2i}=\left(I-H_{2i}\right)^{-{1}/{2}}$, $C_{1i}=I$ and $C_{2i}=I$; then the estimators (5) and (6) will be equal to the bias-corrected covariance estimators of BC1. When setting $B_{1i}=\left(I-H_{1i}\right)^{-1}$, $B_{2i}=\left(I-H_{2i}\right)^{-1}$, $C_{1i}=I$ and $C_{2i}=I$, the estimators (5) and (6) become the bias-corrected covariance estimators of BC2. To obtain the bias-corrected covariance estimators of BC3, one can set $B_{1i}$ and $B_{2i}$ as identity matrix $I$, and let $C_{1i}=diag\left\{(1-\min\{\zeta, [Q_{1i}]_{jj}\})^{-{1}/{2}} \right\}$ and $C_{2i}=diag\left\{(1-\min\{\zeta, [Q_{2i}]_{jj}\})^{-{1}/{2}} \right\}$, where $Q_{1i}=D_{i}'V_{i}^{-1}D_{i}\Omega_{1i}^{-1}$, $Q_{2i}=S_{i}'P_{i}^{-1}S_{i}\Omega_{2i}^{-1}$, and set the bound parameter $\zeta=0.75$ to avoid over-correction.The three bias-corrected sandwich estimators are summarized in Table 1. BC2 was reported to have a greater amount of correction than both BC1 and BC3 in general, which will result in a larger standard error of parameter estimates.
+
+|Label | \ \ \ \ \ \ \ \ \ \ Sandwich variance estimator for $\hat{\beta}$ | \ \ \ \ \ \ \ \ \ \ Sandwich variance estimator for $\hat{\alpha}$|
+|:-----|-----------------------------------------------|-----------------------------------------------|
+|      |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ $C_{1i} \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ B_{1i}$ |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ $C_{2i} \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ B_{2i}$ |
+|BC0   |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ $I$ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ $I$ |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ $I$ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ $I$ | 
+|BC1   |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ $I$ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <font size="2">$(I-H_{1i})^{-{1}/{2}}$</font> |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ $I$ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <font size="2">$(I-H_{2i})^{-{1}/{2}}$</font> |
+|BC2   |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ $I$ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <font size="2">$(I-H_{1i})^{-1}$</font> |\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ $I$ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <font size="2">$(I-H_{2i})^{-1}$</font> |
+|BC3   | <font size="1">$diag\left\{(1-\min\{\zeta, [Q_{1i}]_{jj}\})^{-1/2}\right\}^{*}$</font> \ \ \ \ \ \ \ \ $I$ | <font size="1">$diag\left\{(1-\min\{\zeta, [Q_{2i}]_{jj}\})^{-1/2}\right\}^{**}$</font> \ \ \ \ \ \ \ \ $I$ |
+|<font size="1">$*Q_{1i}=D_{i}'V_{i}^{-1}D_{i}\Omega_{1i}^{-1}$; $**Q_{2i}=S_{i}'P_{i}^{-1}S_{i}\Omega_{2i}^{-1}$</font>
+  
+: Table 1: Summary of bias-corrected sandwich variance estimators for $\hat{\beta}$ and $\hat{\alpha}$.
+
+## Function Description
+This package **ORTH.Ord** provides an ALR modeling framework to jointly estimate marginal means and within-cluster association of ordinal outcomes with the ability to adjust for small-sample bias. When using this package, the input data must be numeric for both the response variable and all covariates. For example, if an ordinal response is coded as "never", "sometimes", and "always", the user need to convert it to numeric values, i.e. 1, 2 and 3 accordingly. The arguments of **ORTH.Ord** function are:
+
+******
+    ORTH.Ord(formula_mean, data_mean, cluster, formula_por = NULL, data_por = NULL, 
+             MMORTH = FALSE, BC = NULL, init_beta = NULL, init_alpha = NULL,
+             miter = 30, crit_level = 0.0001)
+******
+
+The details and defaults of arguments are summarized in Table 2, and further explanation is provided below. 
+
+| Argument| Description                  | Default  |
+|:--------|:-----------------------------|:---------|
+|formula_mean | the symbolic description of the marginal mean model that contains the ordinal outcome and marginal mean covariates. |  |  
+|data_mean | the data set containing the ordinal outcome and marginal mean covariates. |  |
+|cluster | cluster ID (consecutive integers) in data_mean. |  |
+|formula_por | the symbolic description of marginal association model in the form of a one-sided formula. | NULL |
+|data_por | a data set for marginal association model. | NULL |
+|MMORTH | a logical value to indicate if matrix-adjusted estimating equations will be applied for association estimation. | FALSE |
+|BC | an option to apply bias-correction on covariance estimation. | NULL |
+|init_beta | pre-specified starting values for parameters in the mean model. | NULL |
+|init_alpha | pre-specified starting values for parameters in the association model. | NULL |
+|miter | maximum number of iterations for Fisher scoring. | 30 |
+|crit_level | tolerance for convergence. | 0.0001 |
+: Table 2: Arguments of **ORTH.Ord**
+\
+\
+
+|          The input argument **formula_mean** is the symbolic description of the marginal mean model, e.g., **formula_mean**=<font size="2">$Y\sim x1+x2$</font>. The argument **data_mean** is an R data set to fit the mean model (1), which should include all the variables required for fitting the mean model, i.e. an ordinal variable as response and one or more variables as covariates. All the variables in the R data set must be coded numerically; character values are required to be converted into numerical values during the data preprocessing step. The argument **cluster** is the column name for the cluster variable. The argument **formula_por** is the symbolic description of the marginal association model. Unlike **formula_mean**, **formula_por** is defined as a one-sided formula, e.g., **formula_por**=<font size="2">$\sim a0+a1$</font>. The argument **data_por** is an R data set to which we will fit association model (2), and should include a variable for cluster and covariates for pairwise association parameters $\alpha$ which often are indicator variables. The default for arguments **data_por** and **formula_por** is NULL. When either of the two arguments is not specified, independence working correlation will be used for $\beta$ estimating equations (1), meaning $R_{i}(\rho)=I_{n_{i}}$ and $V_{i}=A_{i}$. The data for **data_por** must be all numeric too.
+\
+
+|         The argument **MMORTH** is used to indicate whether one wants to apply MMORTH to the estimating equations to adjust for small-sample bias. The default for **MMORTH** is **FALSE**, which will use ORTH without bias correction on the estimating equation for correlation model; when **MMORTH**= TRUE, MMORTH method will be employed. Please note that **MMORTH**=TRUE works only when both **formula_por** and **data_por** are specified. Using the independence working correlation will automatically suppress **MMORTH**. The argument **BC** offers an option to adjust for bias on the sandwich estimators for both $\beta$ and $\alpha$ with BC1, BC2, or BC3 methods. When **BC** is set to the default, the program will only output the standard errors, $z$-values, and corresponding p-values obtained from the uncorrected sandwich estimator (BC0). The possible values for **BC** include "BC1", "BC2", and "BC3". One can specify a single method (e.g., **BC**="BC1") or multiple methods (e.g., **BC**=c("BC1","BC2","BC3")) in **ORTH.Ord** to output the standard errors, $z$-values, and p-values from each method. The arguments **init_beta** and **init_alpha** offer the options to pre-specify the initial values for parameters of the mean model and the association model. The dimension of the vectors for pre-specified starting values should match that of **data_mean** and **data_por**. The argument **miter** is the maximum number of iterations whose default is 30. The argument **crit_level** is a critical value for determining model convergence; the default is 0.0001, which means the model is considered converged if the absolute difference between parameter estimations from two consecutive iterations is smaller or equal to 0.0001.           
+\
+
+|        The value returned by the function **ORTH.Ord** is a list. If argument **BC** is not specified (i.e., **BC**=NULL), the output will be a list with two elements. The first element is a data frame including point estimates, standard errors, $z$-values, and p-values for model parameters; the second element is a variance-covariance matrix of model parameters without bias-correction (BC0). When argument **BC** is specified, for example **BC**=c("BC1","BC2","BC3"), additional elements will be included in the output list which are variance-covariance matrices of model parameters based on BC1, BC2, and BC3. 
+
+
+
+## Reference
+Can Meng, Mary Ryan, Paul Rathouz, Elizabeth Turner, John S Preisser, and Fan Li. 2023. ORTH.Ord: An R package for analyzing correlated ordinal outcomes using alternating logistic regressions with orthogonalized residuals. _Computer Methods and Programs in Biomedicine_, 237, DOI:10.1016/j.cmpb.2023.107567. 
+

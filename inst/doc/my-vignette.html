@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Can Meng, Fan Li" />
+
+
+<title>Package ‘ORTH.Ord’</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Package ‘ORTH.Ord’</h1>
+<h4 class="author">Can Meng, Fan Li</h4>
+<h4 class="date">May 2024</h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>ORTH.Ord is a package designed for analyzing correlated ordinal
+outcomes which are commonly seen in longitudinal studies or clustered
+clinical trials. It implements a modified version of alternating
+logistic regressions (ALR) with estimation based on orthogonalized
+residuals (ORTH), which use paired estimating equations to jointly
+estimate parameters in marginal mean and within-association models. The
+within-cluster association between ordinal responses is modeled by
+global pairwise odds ratios (POR). This R package also provides a
+finite-sample bias correction to POR parameter estimates based on matrix
+multiplicative adjusted orthogonalized residuals (MMORTH) for correcting
+estimating equations, and different bias-corrected variance estimators
+such as BC1, BC2, and BC3. We refer users to our published paper (Meng
+et al., 2023) for details.</p>
+</div>
+<div id="statistical-methods" class="section level2">
+<h2>Statistical Methods</h2>
+<p>ALR uses marginal models with generalized estimating equations (GEE)
+to jointly estimate marginal means and within-cluster associations. Let
+<span class="math inline">\(O_{ij}\)</span> be an ordinal response with
+<span class="math inline">\(C+1\)</span> levels, say <span class="math inline">\(1,\ldots,C+1\)</span>, for the <span class="math inline">\(j^{th}\)</span> observation in the <span class="math inline">\(i^{th}\)</span> cluster, where cluster <span class="math inline">\(i\)</span> has <span class="math inline">\(n_{i}\)</span> observations and <span class="math inline">\(i=1,\dots,N\)</span>. Let <span class="math inline">\(Y_{ij}^{(c)}\)</span> denote a binary indicator
+for the level of ordinal response <span class="math inline">\(O_{ij}\)</span> such that <span class="math inline">\(Y_{ij}^{(c)}=I(O_{ij} \leq c)\)</span> where <span class="math inline">\(c=1,\dots,C\)</span>. For a given cluster <span class="math inline">\(i\)</span>, the response vector <span class="math inline">\(Y_i=\left(Y_{i1}^{(1)},\dots,Y_{i1}^{(C)},\dots,Y_{in_{i}}^{(1)},\dots,Y_{in_{i}}^{(C)}\right)&#39;\)</span>
+has <span class="math inline">\(Cn_{i}\)</span> elements. Ordinal
+outcomes are usually modeled with the proportional odds assumption,
+which means the covariate vector <span class="math inline">\(X_{ij}\)</span> will have the same effect across
+all levels of <span class="math inline">\(O_{ij}\)</span>. A marginal
+mean model for <span class="math inline">\(Y_{ij}^{(c)}\)</span> using a
+proportional-odds cumulative logit model can be written as: <span class="math display">\[\begin{equation}
+\tag{1}
+logit\left\{E\left(Y_{ij}^{(c)}|X_{ij}\right)\right\}=\delta_{c} +
+X_{ij}^\prime\beta
+\end{equation}\]</span> where the intercept <span class="math inline">\(\delta_{c}\)</span> represents the log-odds of
+falling into or below level <span class="math inline">\(c\)</span>
+(<span class="math inline">\(O_{ij} \leq c\)</span>) when <span class="math inline">\(X_{ij}={0}\)</span>, and coefficient vector <span class="math inline">\(\beta\)</span> represents the effect of each
+element of <span class="math inline">\(X_{ij}\)</span> and remains
+constant across levels of <span class="math inline">\(O_{ij}\)</span>
+under the proportional odds assumption.<br />
+<br />
+</p>
+<div class="line-block">        In addition to estimating parameters in
+model (1) using GEE, a within-cluster association structure is
+specified. The POR, denoted as <span class="math inline">\(\psi_{ij,k}^{(a,b)}\)</span> for measuring
+within-cluster association, is defined for the response pair <span class="math inline">\(\left(Y_{ij}^{(a)}, Y_{ik}^{(b)}\right)\)</span>
+as:</div>
+<p><span class="math display">\[\begin{align}
+    \psi_{ij,k}^{(a,b)}
+&amp;=\frac{Pr\left(Y_{ij}^{(a)}=1,Y_{ik}^{(b)}=1\right)\times
+Pr\left(Y_{ij}^{(a)}=0,Y_{ik}^{(b)}=0\right)
+}{Pr\left(Y_{ij}^{(a)}=1,Y_{ik}^{(b)}=0\right)\times
+Pr\left(Y_{ij}^{(a)}=0,Y_{ik}^{(b)}=1\right)} \nonumber \\
+    &amp;=\frac{\mu_{ij,k}^{(a,b)}\left(1-\mu_{ij}^{(a)}-\mu_{ik}^{(b)}+\mu_{ij,k}^{(a,b)}\right)}{\left(\mu_{ij}^{(a)}-\mu_{ij,k}^{(a,b)}\right)\left(\mu_{ik}^{(b)}-\mu_{ij,k}^{(a,b)}\right)}
+\end{align}\]</span> where <span class="math inline">\(\mu_{ij}^{(a)}=E\left(Y_{ij}^{(a)}\right)=Pr\left(Y_{ij}^{(a)}=1\right)\)</span>,
+<span class="math inline">\(\mu_{ik}^{(b)}=E\left(Y_{ik}^{(b)}\right)=Pr\left(Y_{ik}^{(b)}=1\right)\)</span>,
+and <span class="math inline">\(\mu_{ij,k}^{(a,b)}=E\left(Y_{ij}^{(a)}Y_{ik}^{(b)}\right)=Pr\left(Y_{ij}^{(a)}=Y_{ik}^{(b)}=1\right)\)</span>
+for <span class="math inline">\(1 \leq a,b \leq C\)</span>,<span class="math inline">\(1 \leq j &lt; k \leq n_{i}\)</span>. If we let
+<span class="math inline">\(\alpha\)</span> be a vector of association
+parameters, then a generalized linear model for <span class="math inline">\(\psi_{ij,k}^{(a,b)}\)</span> is specified as:
+<span class="math display">\[\begin{equation}
+\tag{2}
+    log\left(\psi_{ij,k}^{(a,b)}\right)=Z^{(a,b)\prime}_{ij,k}\alpha
+\end{equation}\]</span><br />
+where <span class="math inline">\(Z^{(a,b)}_{ij,k}\)</span> is a
+covariate vector. We assume the POR is independent from cutpoints <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>, namely <span class="math inline">\(\psi_{ij,k}^{(a,b)}=\psi_{ij,k}\)</span>, so that
+a parsimonious model for the within-cluster association can be obtained.
+Note that model (2) is the association model for ALR. The mean parameter
+<span class="math inline">\(\beta\)</span> from model (1) and
+association parameter <span class="math inline">\(\alpha\)</span> from
+model (2) are jointly estimated through GEE. The estimate of <span class="math inline">\(\beta\)</span> from model (1) is the solution to
+the estimating equations: <span class="math display">\[\begin{equation}
+\tag{3}
+    U_{\beta}=\sum_{i=1}^{N} D_{i}&#39;V_{i}^{-1}(Y_{i}-\mu_{i})=0
+\end{equation}\]</span> where <span class="math inline">\(D_i=\partial\mu_i/\partial\beta^\prime\)</span>,
+<span class="math inline">\(\mu_{i}\)</span> is determined by model (1),
+and <span class="math inline">\(V_i\)</span> is a working variance
+matrix for the binary response <span class="math inline">\(Y_i\)</span>.<br />
+<br />
+</p>
+<div class="line-block">        ALR also relies on another estimating
+equations to estimate association parameter vector <span class="math inline">\(\alpha\)</span>. In this package, the estimating
+equation for <span class="math inline">\(\alpha\)</span> is based on
+ORTH, which could reduce the dependence of the variance estimate on
+observation ordering and increase efficiency when dealing with unequal
+cluster sizes. Define <span class="math inline">\(\sigma^{(a)}_{ij,j}=Var\left(Y_{ij}^{(a)}\right)=\mu_{ij}^{(a)}\left(1-\mu_{ij}^{(a)}\right)\)</span>,
+<span class="math inline">\(\sigma^{(b)}_{ik,k}=Var\left(Y_{ik}^{(b)}\right)=\mu_{ik}^{(b)}\left(1-\mu_{ik}^{(b)}\right)\)</span>,
+and <span class="math inline">\(\sigma^{(a,b)}_{ij,k}=Cov\left(Y_{ij}^{(a)},Y_{ik}^{(b)}\right)=\mu_{ij,k}^{(a,b)}-\mu_{ij}^{(a)}\mu_{ik}^{(b)}\)</span>
+for <span class="math inline">\(1 \leq a,b \leq C\)</span>,<span class="math inline">\(1 \leq j &lt; k \leq n_{i}\)</span>. In ORTH,
+orthogonalized residuals, denoted as <span class="math inline">\(T_{ij,k}^{(a,b)}\)</span>, are based on the
+expectations of cross-products <span class="math inline">\(Y_{ij}^{(a)}Y_{ik}^{(b)}\)</span> conditional on
+<span class="math inline">\(Y_{ij}^{(a)}\)</span> and <span class="math inline">\(Y_{ik}^{(b)}\)</span>: <span class="math inline">\(E\left(Y_{ij}^{(a)}Y_{ik}^{(b)}|Y_{ij}^{(a)},
+Y_{ik}^{(b)}\right)\)</span>. Then <span class="math inline">\(T_{ij,k}^{(a,b)}\)</span> can be expressed
+as:</div>
+<p><span class="math display">\[\begin{align}
+    T_{ij,k}^{(a,b)} &amp;=
+\left({\sigma^{(a)}_{ij,j}}{\sigma^{(b)}_{ik,k}}\right)^{1/2}\left(R_{ij,k}^{(a,b)}-\rho_{ij,k}^{(a,b)}\right)-\left(b_{ijk:j}^{(a,b)}-\mu_{ik}^{(b)}\right)\left(Y_{ij}^{(a)}-\mu_{ij}^{(a)}\right)-\left(b_{ijk:k}^{(a,b)}-\mu_{ij}^{(a)}\right)\left(Y_{ik}^{(b)}-\mu_{ik}^{(b)}\right)
+\end{align}\]</span> where <span class="math display">\[\begin{align}
+    R_{ij,k}^{(a,b)}=&amp;r_{ij}^{(a)}r_{ik}^{(b)}=\left\{\left(Y_{ij}^{(a)}-\mu_{ij}^{(a)}\right)/\left(\sigma^{(a)}_{ij,j}\right)^{1/2}\right\}\left\{\left(Y_{ik}^{(b)}-\mu_{ik}^{(b)}\right)/\left(\sigma^{(b)}_{ik,k}\right)^{1/2}\right\}
+\\
+    \rho_{ijk}^{(a,b)}=&amp;Corr\left(Y_{ij}^{(a)},
+Y_{ik}^{(b)}\right)=\left(\mu_{ij,k}^{(a,b)}-\mu_{ij}^{(a)}\mu_{ik}^{(b)}\right)/\left(\sigma^{(a)}_{ij,j}\sigma^{(b)}_{ik,k}\right)^{1/2}
+\\
+    b_{ijk:j}^{(a,b)}=&amp;
+\mu_{ij,k}^{(a,b)}\left(1-\mu_{ik}^{(b)}\right)\left(\mu_{ik}^{(b)}-\mu_{ij,k}^{(a,b)}\right)/d_{ij,k}^{(a,b)}
+\\
+     b_{ijk:k}^{(a,b)}=&amp;
+\mu_{ij,k}^{(a,b)}\left(1-\mu_{ij}^{(a)}\right)\left(\mu_{ij}^{(a)}-\mu_{ij,k}^{(a,b)}\right)/d_{ij,k}^{(a,b)}
+\\
+     d_{ij,k}^{(a,b)}=&amp;
+\sigma^{(a)}_{ij,j}\sigma^{(b)}_{ik,k}-\left(\sigma^{(a,b)}_{ij,k}\right)^2
+\end{align}\]</span> We also define <span class="math display">\[\begin{align}
+    T_{ij,k}=&amp;\left(T_{ij,k}^{(1,1)},T_{ij,k}^{(1,2)},\cdots,T_{ij,k}^{(1,C-1)},T_{ij,k}^{(1,C)},T_{ij,k}^{(2,1)},T_{ij,k}^{(2,2)},\cdots,T_{ij,k}^{(2,C)},\cdots,T_{ij,k}^{(C,1)},T_{ij,k}^{(C,2)},\cdots,T_{ij,k}^{(C,C)}\right)&#39;\\
+    T_{i}=&amp;\left(T_{i1,2}&#39;,T_{i1,3}&#39;,\cdots,T_{i1,(n_{i}-1)}&#39;,T_{i1,n_{i}}&#39;,T_{i2,3}&#39;,T_{i2,4}&#39;,\cdots,T_{i2,(n_{i}-1)}&#39;,T_{i2,n_{i}}&#39;,\cdots,T_{i(n_{i}-1),n_{i}}&#39;\right)&#39;
+\end{align}\]</span> to be vectors for the orthogonalized residuals,
+where the dimension of <span class="math inline">\(T_{i}\)</span> is
+<span class="math inline">\(C^2n_{i}(n_{i}-1)/2\)</span>. In ORTH,
+association parameter <span class="math inline">\(\alpha\)</span> is
+estimated by the solution to <span class="math display">\[\begin{equation}
+\tag{4}
+    U_{\alpha, ORTH}=\sum_{i=1}^N S_{i}&#39;P_{i}^{-1}T_{i}=0
+\end{equation}\]</span> where <span class="math inline">\(S_{i}=E(-\partial T_{i}/\partial \alpha)\)</span>,
+and <span class="math inline">\(P_i\approx Var(T_{i})\)</span> with
+elements defined by <span class="math inline">\(Cov\left(T_{ij,k}^{(a,b)},T_{ij&#39;,k&#39;}^{(a&#39;,b&#39;)}\right)\)</span>.<br />
+<br />
+</p>
+<div class="line-block">        In order to adjust for small-sample bias
+in the ORTH procedure, we extend MMORTH to correlated ordinal data
+analysis. In MMORTH, matrix multiplicative adjusted orthogonalized
+residuals are used by substituting <span class="math inline">\(R_{ij,k}^{(a,b)}\)</span> with a bias-corrected
+correlation <span class="math inline">\(\tilde{R}_{ij,k}^{(a,b)}\)</span>. Let the cluster
+leverage matrix be <span class="math inline">\(H_{1i}=D_{i}\left(\sum_{i=1}^N
+D_{i}&#39;V_{i}^{-1}D_{i}\right)^{-1}D_{i}&#39;V_{i}^{-1}\)</span>, and
+define <span class="math inline">\(G_{i}=(I_{Cn_{i}}-H_{1i})^{-1}\)</span> where
+<span class="math inline">\(I_{Cn_{i}}\)</span> is an identity matrix.
+Let <span class="math inline">\(r_{i}\)</span> be a <span class="math inline">\(Cn_{i}\times 1\)</span> vector <span class="math inline">\(\left(r_{i1}^{(1)},\cdots,r_{i1}^{(C)},\cdots,r_{in_{i}}^{(1)},\cdots,r_{in_{i}}^{(C)}\right)\)</span>
+where <span class="math inline">\(r_{ij}^{c}=\left\{\left(Y_{ij}^{(c)}-\mu_{ij}^{(c)}\right)/\left(\sigma^{(c)}_{ij,j}\right)^{1/2}\right\}\)</span>
+with <span class="math inline">\(1\leq c \leq C\)</span> and <span class="math inline">\(j=1,\cdots n_{i}\)</span>, and define matrix <span class="math inline">\(R_{i}=r_{i}r&#39;_{i}\)</span>. We further define
+<span class="math inline">\(G_{ij\cdot}\)</span> to be the <span class="math inline">\(j^{th}\)</span> row of matrix <span class="math inline">\(G_{i}\)</span>, and <span class="math inline">\(R_{i\cdot k}^{(a,b)}\)</span> to be the <span class="math inline">\(k^{th}\)</span> column of matrix <span class="math inline">\(R_{i}\)</span>, then <span class="math inline">\(\tilde{R}_{ij,k}^{(a,b)}=G_{ij\cdot}R_{i\cdot
+k}^{(a,b)}\)</span>. The bias-corrected orthogonalized residual, denoted
+as <span class="math inline">\(\tilde{T}_{ij,k}^{(a,b)}\)</span>, is
+defined as:</div>
+<p><span class="math display">\[\begin{align}
+    \tilde{T}_{ij,k}^{(a,b)} &amp;=
+\left({\sigma^{(a)}_{ij,j}}{\sigma^{(b)}_{ik,k}}\right)^{1/2}\left(\tilde{R}_{ij,k}^{(a,b)}-\rho_{ij,k}^{(a,b)}\right)-\left(b_{ijk:j}^{(a,b)}-\mu_{ik}^{(b)}\right)\left(Y_{ij}^{(a)}-\mu_{ij}^{(a)}\right)-\left(b_{ijk:k}^{(a,b)}-\mu_{ij}^{(a)}\right)\left(Y_{ik}^{(b)}-\mu_{ik}^{(b)}\right)
+\end{align}\]</span> MMORTH uses <span class="math inline">\(\tilde{T}_{ij,k}^{(a,b)}\)</span> as an estimate
+of <span class="math inline">\(T_{ij,k}^{(a,b)}\)</span> in the
+estimating equation (4).<br />
+<br />
+</p>
+<div class="line-block">      The GEE sandwich variance estimators also
+tend to be biased when the number of clusters is small. We implement
+three popular bias-corrected sandwich variance estimators in this R
+package, which can be used in combination with ORTH and MMORTH. Let
+<span class="math inline">\(\Omega_{1i}=\sum_{i=1}^{N}
+D_{i}&#39;V_{i}^{-1}D_{i}\)</span> be the inverse of the model-based
+variance, then the sandwich variance estimator for <span class="math inline">\(\hat{\beta}\)</span> can be expressed as:</div>
+<p><span class="math display">\[\begin{equation}
+\tag{5}
+     \Omega_{1i}^{-1} \left\{\sum_{i=1}^{N}
+C_{1i}D_{i}&#39;V_{i}^{-1}B_{1i}(Y_{i}-\mu_{i})(Y_{i}-\mu_{i})&#39;B_{1i}&#39;V_{i}^{-1}D_{i}C_{1i}\right\}
+\Omega_{1i}^{-1}
+\end{equation}\]</span> Further, let <span class="math inline">\(\Omega_{2i}=\sum_{i=1}^{N}
+S_{i}&#39;P_{i}^{-1}S_{i}\)</span>, then the sandwich variance estimator
+for <span class="math inline">\(\hat{\alpha}\)</span> is: <span class="math display">\[\begin{equation}
+\tag{6}
+    \Omega_{2i}^{-1} \left\{\sum_{i=1}^{N}
+C_{2i}S_{i}&#39;P_{i}^{-1}B_{2i}T_{i}T_{i}&#39;B_{2i}&#39;P_{i}^{-1}S_{i}C_{2i}\right\}
+\Omega_{2i}^{-1}
+\end{equation}\]</span> When <span class="math inline">\(B_{1i}=I\)</span>, <span class="math inline">\(B_{2i}=I\)</span>, <span class="math inline">\(C_{1i}=I\)</span> and <span class="math inline">\(C_{2i}=I\)</span>, there is no bias-correction,
+and estimators (5) and (6) refer to the uncorrected sandwich estimators
+for <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\alpha\)</span>; we will refer to these estimators
+as BC0. Different choices for <span class="math inline">\(B_{1i}\)</span>, <span class="math inline">\(B_{2i}\)</span>, <span class="math inline">\(C_{1i}\)</span>, and <span class="math inline">\(C_{2i}\)</span> will give different bias-corrected
+sandwich estimators. The three commonly used approaches for bias
+corrections considered here are illustrated as follows. Define <span class="math inline">\(H_{1i}\)</span> and <span class="math inline">\(H_{2i}\)</span> as cluster leverage matrices based
+on the marginal mean and association regression models. Let <span class="math inline">\(B_{1i}=\left(I-H_{1i}\right)^{-{1}/{2}}\)</span>,
+<span class="math inline">\(B_{2i}=\left(I-H_{2i}\right)^{-{1}/{2}}\)</span>,
+<span class="math inline">\(C_{1i}=I\)</span> and <span class="math inline">\(C_{2i}=I\)</span>; then the estimators (5) and (6)
+will be equal to the bias-corrected covariance estimators of BC1. When
+setting <span class="math inline">\(B_{1i}=\left(I-H_{1i}\right)^{-1}\)</span>, <span class="math inline">\(B_{2i}=\left(I-H_{2i}\right)^{-1}\)</span>, <span class="math inline">\(C_{1i}=I\)</span> and <span class="math inline">\(C_{2i}=I\)</span>, the estimators (5) and (6)
+become the bias-corrected covariance estimators of BC2. To obtain the
+bias-corrected covariance estimators of BC3, one can set <span class="math inline">\(B_{1i}\)</span> and <span class="math inline">\(B_{2i}\)</span> as identity matrix <span class="math inline">\(I\)</span>, and let <span class="math inline">\(C_{1i}=diag\left\{(1-\min\{\zeta,
+[Q_{1i}]_{jj}\})^{-{1}/{2}} \right\}\)</span> and <span class="math inline">\(C_{2i}=diag\left\{(1-\min\{\zeta,
+[Q_{2i}]_{jj}\})^{-{1}/{2}} \right\}\)</span>, where <span class="math inline">\(Q_{1i}=D_{i}&#39;V_{i}^{-1}D_{i}\Omega_{1i}^{-1}\)</span>,
+<span class="math inline">\(Q_{2i}=S_{i}&#39;P_{i}^{-1}S_{i}\Omega_{2i}^{-1}\)</span>,
+and set the bound parameter <span class="math inline">\(\zeta=0.75\)</span> to avoid over-correction.The
+three bias-corrected sandwich estimators are summarized in Table 1. BC2
+was reported to have a greater amount of correction than both BC1 and
+BC3 in general, which will result in a larger standard error of
+parameter estimates.</p>
+<table>
+<caption>Table 1: Summary of bias-corrected sandwich variance estimators
+for <span class="math inline">\(\hat{\beta}\)</span> and <span class="math inline">\(\hat{\alpha}\)</span>.</caption>
+<colgroup>
+<col width="6%" />
+<col width="47%" />
+<col width="47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Label</th>
+<th>          Sandwich variance estimator for <span class="math inline">\(\hat{\beta}\)</span></th>
+<th>          Sandwich variance estimator for <span class="math inline">\(\hat{\alpha}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"></td>
+<td>                  <span class="math inline">\(C_{1i} \ \ \ \ \ \ \ \
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ B_{1i}\)</span></td>
+<td>                  <span class="math inline">\(C_{2i} \ \ \ \ \ \ \ \
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ B_{2i}\)</span></td>
+</tr>
+<tr class="even">
+<td align="left">BC0</td>
+<td>                 <span class="math inline">\(I\)</span>
+                                    <span class="math inline">\(I\)</span></td>
+<td>                 <span class="math inline">\(I\)</span>
+                                    <span class="math inline">\(I\)</span></td>
+</tr>
+<tr class="odd">
+<td align="left">BC1</td>
+<td>                <span class="math inline">\(I\)</span>
+                          <font size="2"><span class="math inline">\((I-H_{1i})^{-{1}/{2}}\)</span></font></td>
+<td>                <span class="math inline">\(I\)</span>
+                           <font size="2"><span class="math inline">\((I-H_{2i})^{-{1}/{2}}\)</span></font></td>
+</tr>
+<tr class="even">
+<td align="left">BC2</td>
+<td>                <span class="math inline">\(I\)</span>
+                           <font size="2"><span class="math inline">\((I-H_{1i})^{-1}\)</span></font></td>
+<td>                <span class="math inline">\(I\)</span>
+                            <font size="2"><span class="math inline">\((I-H_{2i})^{-1}\)</span></font></td>
+</tr>
+<tr class="odd">
+<td align="left">BC3</td>
+<td><font size="1"><span class="math inline">\(diag\left\{(1-\min\{\zeta,
+[Q_{1i}]_{jj}\})^{-1/2}\right\}^{*}\)</span></font>         <span class="math inline">\(I\)</span></td>
+<td><font size="1"><span class="math inline">\(diag\left\{(1-\min\{\zeta,
+[Q_{2i}]_{jj}\})^{-1/2}\right\}^{**}\)</span></font>         <span class="math inline">\(I\)</span></td>
+</tr>
+<tr class="even">
+<td align="left"><font size="1"><span class="math inline">\(*Q_{1i}=D_{i}&#39;V_{i}^{-1}D_{i}\Omega_{1i}^{-1}\)</span>;
+<span class="math inline">\(**Q_{2i}=S_{i}&#39;P_{i}^{-1}S_{i}\Omega_{2i}^{-1}\)</span></font></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="function-description" class="section level2">
+<h2>Function Description</h2>
+<p>This package <strong>ORTH.Ord</strong> provides an ALR modeling
+framework to jointly estimate marginal means and within-cluster
+association of ordinal outcomes with the ability to adjust for
+small-sample bias. When using this package, the input data must be
+numeric for both the response variable and all covariates. For example,
+if an ordinal response is coded as “never”, “sometimes”, and “always”,
+the user need to convert it to numeric values, i.e. 1, 2 and 3
+accordingly. The arguments of <strong>ORTH.Ord</strong> function
+are:</p>
+<hr />
+<pre><code>ORTH.Ord(formula_mean, data_mean, cluster, formula_por = NULL, data_por = NULL, 
+         MMORTH = FALSE, BC = NULL, init_beta = NULL, init_alpha = NULL,
+         miter = 30, crit_level = 0.0001)</code></pre>
+<hr />
+<p>The details and defaults of arguments are summarized in Table 2, and
+further explanation is provided below.</p>
+<table>
+<caption>Table 2: Arguments of <strong>ORTH.Ord</strong><br />
+<br />
+</caption>
+<colgroup>
+<col width="18%" />
+<col width="61%" />
+<col width="20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Argument</th>
+<th align="left">Description</th>
+<th align="left">Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">formula_mean</td>
+<td align="left">the symbolic description of the marginal mean model
+that contains the ordinal outcome and marginal mean covariates.</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">data_mean</td>
+<td align="left">the data set containing the ordinal outcome and
+marginal mean covariates.</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">cluster</td>
+<td align="left">cluster ID (consecutive integers) in data_mean.</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">formula_por</td>
+<td align="left">the symbolic description of marginal association model
+in the form of a one-sided formula.</td>
+<td align="left">NULL</td>
+</tr>
+<tr class="odd">
+<td align="left">data_por</td>
+<td align="left">a data set for marginal association model.</td>
+<td align="left">NULL</td>
+</tr>
+<tr class="even">
+<td align="left">MMORTH</td>
+<td align="left">a logical value to indicate if matrix-adjusted
+estimating equations will be applied for association estimation.</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="odd">
+<td align="left">BC</td>
+<td align="left">an option to apply bias-correction on covariance
+estimation.</td>
+<td align="left">NULL</td>
+</tr>
+<tr class="even">
+<td align="left">init_beta</td>
+<td align="left">pre-specified starting values for parameters in the
+mean model.</td>
+<td align="left">NULL</td>
+</tr>
+<tr class="odd">
+<td align="left">init_alpha</td>
+<td align="left">pre-specified starting values for parameters in the
+association model.</td>
+<td align="left">NULL</td>
+</tr>
+<tr class="even">
+<td align="left">miter</td>
+<td align="left">maximum number of iterations for Fisher scoring.</td>
+<td align="left">30</td>
+</tr>
+<tr class="odd">
+<td align="left">crit_level</td>
+<td align="left">tolerance for convergence.</td>
+<td align="left">0.0001</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">         The input argument
+<strong>formula_mean</strong> is the symbolic description of the
+marginal mean model, e.g.,
+<strong>formula_mean</strong>=<font size="2"><span class="math inline">\(Y\sim x1+x2\)</span></font>. The argument
+<strong>data_mean</strong> is an R data set to fit the mean model (1),
+which should include all the variables required for fitting the mean
+model, i.e. an ordinal variable as response and one or more variables as
+covariates. All the variables in the R data set must be coded
+numerically; character values are required to be converted into
+numerical values during the data preprocessing step. The argument
+<strong>cluster</strong> is the column name for the cluster variable.
+The argument <strong>formula_por</strong> is the symbolic description of
+the marginal association model. Unlike <strong>formula_mean</strong>,
+<strong>formula_por</strong> is defined as a one-sided formula, e.g.,
+<strong>formula_por</strong>=<font size="2"><span class="math inline">\(\sim a0+a1\)</span></font>. The argument
+<strong>data_por</strong> is an R data set to which we will fit
+association model (2), and should include a variable for cluster and
+covariates for pairwise association parameters <span class="math inline">\(\alpha\)</span> which often are indicator
+variables. The default for arguments <strong>data_por</strong> and
+<strong>formula_por</strong> is NULL. When either of the two arguments
+is not specified, independence working correlation will be used for
+<span class="math inline">\(\beta\)</span> estimating equations (1),
+meaning <span class="math inline">\(R_{i}(\rho)=I_{n_{i}}\)</span> and
+<span class="math inline">\(V_{i}=A_{i}\)</span>. The data for
+<strong>data_por</strong> must be all numeric too.</div>
+<p><br />
+</p>
+<div class="line-block">        The argument <strong>MMORTH</strong> is
+used to indicate whether one wants to apply MMORTH to the estimating
+equations to adjust for small-sample bias. The default for
+<strong>MMORTH</strong> is <strong>FALSE</strong>, which will use ORTH
+without bias correction on the estimating equation for correlation
+model; when <strong>MMORTH</strong>= TRUE, MMORTH method will be
+employed. Please note that <strong>MMORTH</strong>=TRUE works only when
+both <strong>formula_por</strong> and <strong>data_por</strong> are
+specified. Using the independence working correlation will automatically
+suppress <strong>MMORTH</strong>. The argument <strong>BC</strong>
+offers an option to adjust for bias on the sandwich estimators for both
+<span class="math inline">\(\beta\)</span> and <span class="math inline">\(\alpha\)</span> with BC1, BC2, or BC3 methods.
+When <strong>BC</strong> is set to the default, the program will only
+output the standard errors, <span class="math inline">\(z\)</span>-values, and corresponding p-values
+obtained from the uncorrected sandwich estimator (BC0). The possible
+values for <strong>BC</strong> include “BC1”, “BC2”, and “BC3”. One can
+specify a single method (e.g., <strong>BC</strong>=“BC1”) or multiple
+methods (e.g., <strong>BC</strong>=c(“BC1”,“BC2”,“BC3”)) in
+<strong>ORTH.Ord</strong> to output the standard errors, <span class="math inline">\(z\)</span>-values, and p-values from each method.
+The arguments <strong>init_beta</strong> and <strong>init_alpha</strong>
+offer the options to pre-specify the initial values for parameters of
+the mean model and the association model. The dimension of the vectors
+for pre-specified starting values should match that of
+<strong>data_mean</strong> and <strong>data_por</strong>. The argument
+<strong>miter</strong> is the maximum number of iterations whose default
+is 30. The argument <strong>crit_level</strong> is a critical value for
+determining model convergence; the default is 0.0001, which means the
+model is considered converged if the absolute difference between
+parameter estimations from two consecutive iterations is smaller or
+equal to 0.0001.</div>
+<p><br />
+</p>
+<div class="line-block">       The value returned by the function
+<strong>ORTH.Ord</strong> is a list. If argument <strong>BC</strong> is
+not specified (i.e., <strong>BC</strong>=NULL), the output will be a
+list with two elements. The first element is a data frame including
+point estimates, standard errors, <span class="math inline">\(z\)</span>-values, and p-values for model
+parameters; the second element is a variance-covariance matrix of model
+parameters without bias-correction (BC0). When argument
+<strong>BC</strong> is specified, for example
+<strong>BC</strong>=c(“BC1”,“BC2”,“BC3”), additional elements will be
+included in the output list which are variance-covariance matrices of
+model parameters based on BC1, BC2, and BC3.</div>
+</div>
+<div id="reference" class="section level2">
+<h2>Reference</h2>
+<p>Can Meng, Mary Ryan, Paul Rathouz, Elizabeth Turner, John S Preisser,
+and Fan Li. 2023. ORTH.Ord: An R package for analyzing correlated
+ordinal outcomes using alternating logistic regressions with
+orthogonalized residuals. <em>Computer Methods and Programs in
+Biomedicine</em>, 237, <a href="DOI:10.1016/j.cmpb.2023.107567" class="uri">DOI:10.1016/j.cmpb.2023.107567</a>.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
